@@ -116,7 +116,7 @@ const Footer = () => {
               Copyright © 2025 CB COMERCIAL. Todos os Direitos Reservados.
             </p>
             <p className="text-gray-400 text-sm mt-4 md:mt-0">
-              Desenvolvido com ❤️ por Bolt
+              Desenvolvido por SB DevSolutions
             </p>
           </div>
         </div>
