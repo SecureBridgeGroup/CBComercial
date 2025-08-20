@@ -2,18 +2,67 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/png" href="/CBComercial/logotipo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CB Comercial - Distribuidora de Alimentos em Manaus</title>
+
+    <title>CB Comercial | Distribuidora de Alimentos em Manaus</title>
     <meta name="description" content="CB Comercial - Distribuidora de alimentos em Manaus. Atendemos padarias, pizzarias, docerias, cafeterias, hotéis e restaurantes com qualidade e excelência.">
     <meta name="keywords" content="distribuidora alimentos manaus, cb comercial, atacadista manaus, produtos alimentícios, padaria, pizzaria, restaurante">
+
+    <!-- SEO Social - Open Graph -->
+    <meta property="og:title" content="CB Comercial" />
+    <meta property="og:description" content="Distribuidora de Alimentos em Manaus — excelência, variedade e agilidade." />
+    <meta property="og:image" content="/CBComercial/logotipo.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cbcomercial.com.br" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CB Comercial" />
+    <meta name="twitter:description" content="Distribuidora de alimentos em Manaus com excelência e variedade." />
+    <meta name="twitter:image" content="/CBComercial/logotipo.png" />
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "CB Comercial",
+        "url": "https://cbcomercial.com.br",
+        "logo": "https://cbcomercial.com.br/logotipo.png",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+55-92-3016-7065",
+          "contactType": "customer service",
+          "areaServed": "BR"
+        }
+      }
+    </script>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/CBComercial/assets/index-B8_dVceJ.js"></script>
-    <link rel="stylesheet" crossorigin href="/CBComercial/assets/index-smmaN_E1.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="/CBComercial/assets/index-B72A-6xQ.js"></script>
+    <link rel="stylesheet" crossorigin href="/CBComercial/assets/index-DqVZ_pjP.css">
   </head>
+
   <body>
     <div id="root"></div>
+
+    <!-- Animação da logo -->
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const logo = document.querySelector('.animated-logo');
+        if (logo) {
+          logo.style.opacity = 0;
+          logo.style.transition = 'opacity 1.5s ease-out';
+          setTimeout(() => logo.style.opacity = 1, 300);
+        }
+      });
+    </script>
   </body>
 </html>
