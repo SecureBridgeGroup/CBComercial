@@ -1,32 +1,30 @@
 import { Star, Truck, Handshake, BadgeCheck } from 'lucide-react';
 import { basePath } from '../utils/basePath';
 
-// nomes iguais aos arquivos em /public/icon
 const suppliersLine1 = [
-  { name: 'Mariza',       logo: 'Mariza.png' },
-  { name: 'Toffano',      logo: 'Toffano.png' },
-  { name: '3M',           logo: '3M.png' },
-  { name: 'Artek',        logo: 'Artek.png' },
-  { name: 'Bonna Vitta',  logo: 'Bonnavitta.png' },
-  { name: 'Brassuco',     logo: 'Brassuco.png' },
-  { name: 'Copra',        logo: 'Copra.png' },
-  { name: 'Danilla',      logo: 'Danilla.avif' },
-  { name: 'Heinz',        logo: 'Heinz.png' },
+  { name: 'Mariza',      logo: 'Mariza.png' },
+  { name: 'Toffano',     logo: 'Toffano.png' },
+  { name: '3M',          logo: '3M.png' },
+  { name: 'Artek',       logo: 'Artek.png' },
+  { name: 'Bonna Vitta', logo: 'Bonnavitta.png' },
+  { name: 'Brassuco',    logo: 'Brassuco.png' },
+  { name: 'Copra',       logo: 'Copra.png' },
+  { name: 'Danilla',     logo: 'Danilla.avif' },
+  { name: 'Heinz',       logo: 'Heinz.png' },
 ];
 
 const suppliersLine2 = [
-  { name: 'Hileia',       logo: 'Hileia.png' },
-  { name: 'JBS',          logo: 'Jbs.png' },
-  { name: 'Lupus',        logo: 'Lupus.jpg' },
-  { name: 'Virrosas',     logo: 'Virrosas.png' },
-  { name: 'Simonetto',    logo: 'Simonetto.png' },
-  { name: 'Ocrim',        logo: 'Ocrim.jpg' },
-  { name: 'GTex',         logo: 'Gtex.png' },
-  { name: 'Jaks',         logo: 'Jaks.svg' },
-  { name: 'Start',        logo: 'LimaPergher.png' }, // mantém o &; o helper encoda
+  { name: 'Hileia',      logo: 'Hileia.png' },
+  { name: 'JBS',         logo: 'Jbs.png' },
+  { name: 'Lupus',       logo: 'Lupus.jpg' },
+  { name: 'Virrosas',    logo: 'Virrosas.png' },
+  { name: 'Simonetto',   logo: 'Simonetto.png' },
+  { name: 'Ocrim',       logo: 'Ocrim.jpg' },
+  { name: 'GTex',        logo: 'Gtex.png' },
+  { name: 'Jaks',        logo: 'Jaks.svg' },
+  { name: 'Start',       logo: 'LimaPergher.png' }, // usa &, o helper encoda
 ];
 
-// garante "/" e encoda nomes (resolve &)
 const logoUrl = (file: string) => {
   const root = String(basePath || import.meta.env.BASE_URL || '/').replace(/\/?$/, '/');
   return `${root}icon/${encodeURIComponent(file)}`;
@@ -39,14 +37,18 @@ const benefits = [
   { icon: <BadgeCheck className="text-indigo-600 w-6 h-6" />, label: 'Excelência em distribuição' },
 ];
 
+const Card = ({ name, logo }: { name: string; logo: string }) => (
+  <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-md p-4 h-28 w-40 flex items-center justify-center hover:scale-105 transition-transform duration-300 shrink-0">
+    <img src={logoUrl(logo)} alt={name} className="max-h-16 object-contain" loading="lazy" draggable={false} />
+  </div>
+);
+
 const Suppliers = () => {
+  const track1 = [...suppliersLine1, ...suppliersLine1]; // conteúdo duplicado
+  const track2 = [...suppliersLine2, ...suppliersLine2];
+
   return (
-    <section
-      id="fornecedores"
-      className="py-24 bg-gradient-to-b from-gray-100 to-white scroll-mt-16"
-      // se o mascote estiver cobrindo, descomente:
-      // className="py-24 bg-gradient-to-b from-gray-100 to-white scroll-mt-16 md:pl-32"
-    >
+    <section id="fornecedores" className="py-24 bg-gradient-to-b from-gray-100 to-white scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Cabeçalho */}
@@ -70,31 +72,17 @@ const Suppliers = () => {
           ))}
         </div>
 
-        {/* Linha 1 */}
-        <div className="overflow-hidden whitespace-nowrap">
-          <div className="inline-flex animate-marquee space-x-6 min-w-max">
-            {[...suppliersLine1, ...suppliersLine1].map((s, idx) => (
-              <div
-                key={`line1-${idx}`}
-                className="bg-white/80 backdrop-blur-md rounded-xl shadow-md p-4 h-28 w-40 flex items-center justify-center hover:scale-105 transition-transform duration-300 shrink-0"
-              >
-                <img src={logoUrl(s.logo)} alt={s.name} className="max-h-16 object-contain" loading="lazy" />
-              </div>
-            ))}
+        {/* Linha 1 – rolagem contínua */}
+        <div className="overflow-hidden">
+          <div className="marquee-track marquee-gap marquee-track--slow">
+            {track1.map((s, idx) => <Card key={`l1-${idx}-${s.name}`} {...s} />)}
           </div>
         </div>
 
-        {/* Linha 2 */}
-        <div className="overflow-hidden whitespace-nowrap mt-6">
-          <div className="inline-flex animate-marquee space-x-6 min-w-max">
-            {[...suppliersLine2, ...suppliersLine2].map((s, idx) => (
-              <div
-                key={`line2-${idx}`}
-                className="bg-white/80 backdrop-blur-md rounded-xl shadow-md p-4 h-28 w-40 flex items-center justify-center hover:scale-105 transition-transform duration-300 shrink-0"
-              >
-                <img src={logoUrl(s.logo)} alt={s.name} className="max-h-16 object-contain" loading="lazy" />
-              </div>
-            ))}
+        {/* Linha 2 – sentido oposto */}
+        <div className="overflow-hidden mt-6">
+          <div className="marquee-track marquee-gap marquee-track--rev">
+            {track2.map((s, idx) => <Card key={`l2-${idx}-${s.name}`} {...s} />)}
           </div>
         </div>
 

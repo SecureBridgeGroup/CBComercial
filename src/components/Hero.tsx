@@ -2,7 +2,6 @@ import { ShoppingCart, Phone, ArrowRight } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectFade } from 'swiper/modules';
 import 'swiper/css';
-import 'swiper/css/autoplay';
 import 'swiper/css/effect-fade';
 import { basePath } from '../utils/basePath';
 
@@ -20,24 +19,28 @@ const images = [
 
 const Hero = () => {
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    element?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      // mobile: ~68% da viewport; desktop: tela cheia
+      className="relative min-h-[68svh] sm:min-h-screen flex items-center justify-center overflow-hidden"
       role="region"
       aria-label="Seção de introdução"
     >
-      {/* Fundo/carrossel */}
+      {/* Carrossel de fundo */}
       <Swiper
         modules={[Autoplay, EffectFade]}
-        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        slidesPerView={1}
+        spaceBetween={0}
         loop
         effect="fade"
-        className="absolute inset-0 z-0"
+        fadeEffect={{ crossFade: true }}
+        speed={900}
+        autoplay={{ delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true }}
+        className="absolute inset-0 z-0 hero-swiper"
       >
         {images.map((img, index) => (
           <SwiperSlide key={index}>
@@ -46,8 +49,11 @@ const Hero = () => {
                 src={withBase(`hero-carousel/${encodeURIComponent(img.file)}`)}
                 alt={`Slide ${index + 1}`}
                 className="w-full h-full object-cover object-center"
+                decoding="async"
+                loading={index === 0 ? 'eager' : 'lazy'}
               />
-              <p className="absolute bottom-1 right-1 text-xs text-white italic bg-black/40 px-2 py-1 rounded z-30">
+              {/* legenda: oculta no mobile */}
+              <p className="hidden sm:block absolute bottom-1 right-1 text-xs text-white/90 italic bg-black/40 px-2 py-1 rounded z-30">
                 {img.source}
               </p>
             </div>
@@ -55,60 +61,66 @@ const Hero = () => {
         ))}
       </Swiper>
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/60 z-10" />
+      {/* Overlay para contraste (gradiente no mobile) */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
+        <div className="sm:hidden absolute inset-0 bg-gradient-to-b from-black/20 via-black/45 to-black/70" />
+        <div className="hidden sm:block absolute inset-0 bg-black/60" />
+      </div>
 
       {/* Conteúdo */}
-      <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 sm:p-10 md:p-12 mb-10 shadow-lg">
-          <p className="text-lg sm:text-xl md:text-2xl mb-12 text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Há mais de 11 anos levando excelência em distribuição para todo o Amazonas.
-            Com qualidade, agilidade e confiança, abastecemos o varejo amazonense e fazemos o produto certo chegar onde ele deve estar.
-            Distribuindo confiança, de Manaus ao interior.
-          </p>
+      <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 sm:p-8 md:p-10 mb-6 sm:mb-10 shadow-lg ring-1 ring-white/10">
+            <p className="text-base sm:text-xl md:text-2xl mb-5 sm:mb-10 text-blue-100 leading-relaxed">
+              Há mais de 11 anos levando excelência em distribuição para todo o Amazonas.
+              Com qualidade, agilidade e confiança, abastecemos o varejo amazonense e fazemos o produto certo chegar onde ele deve estar.
+              Distribuindo confiança, de Manaus ao interior.
+            </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <button
-              onClick={() => scrollToSection('produtos')}
-              aria-label="Ir para produtos"
-              className="group bg-primary text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-800 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 shadow-xl"
-            >
-              <ShoppingCart className="w-6 h-6" />
-              <span>Ver Produtos</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
+              <button
+                onClick={() => scrollToSection('produtos')}
+                aria-label="Ir para produtos"
+                className="group w-full sm:w-auto bg-primary text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-blue-800 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 shadow-xl"
+              >
+                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span>Ver Produtos</span>
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
 
-            <button
-              onClick={() => scrollToSection('contato')}
-              aria-label="Ir para contato"
-              className="group border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-primary transition-all duration-300 transform hover:scale-105 flex items-center space-x-2"
-            >
-              <Phone className="w-6 h-6" />
-              <span>Fale Conosco</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-          {[
-            { label: 'Colaboradores', value: '80+' },
-            { label: 'Fornecedores', value: '20+' },
-            { label: 'Produtos', value: '1000+' },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-white/10 backdrop-blur-sm rounded-lg p-6 transform hover:scale-105 transition-all duration-300 cursor-default"
-            >
-              <div className="text-4xl font-bold text-yellow-400 mb-2">{stat.value}</div>
-              <div className="text-lg">{stat.label}</div>
+              <button
+                onClick={() => scrollToSection('contato')}
+                aria-label="Ir para contato"
+                className="group w-full sm:w-auto border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-white hover:text-primary transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
+              >
+                <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span>Fale Conosco</span>
+              </button>
             </div>
-          ))}
+          </div>
+
+          {/* Estatísticas */}
+          <div className="grid grid-cols-3 gap-3 sm:gap-8 mt-4 sm:mt-12">
+            {[
+              { label: 'Colaboradores', value: '80+' },
+              { label: 'Fornecedores', value: '20+' },
+              { label: 'Produtos', value: '1000+' },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-6 transition-all duration-300 cursor-default ring-1 ring-white/10"
+              >
+                <div className="text-2xl sm:text-4xl font-bold text-yellow-400 mb-1 sm:mb-2">{stat.value}</div>
+                <div className="text-[11px] sm:text-lg leading-tight">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Indicador de rolagem */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+      <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 animate-bounce">
+        <div className="w-5 h-9 sm:w-6 sm:h-10 border-2 border-white rounded-full flex justify-center">
           <div className="w-1 h-3 bg-white rounded-full mt-2 animate-pulse"></div>
         </div>
       </div>

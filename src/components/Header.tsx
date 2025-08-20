@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, ShoppingCart, User, Phone, MapPin } from 'lucide-react';
+import { Menu, X, ShoppingCart, User, Phone, MapPin, Instagram } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { basePath } from '../utils/basePath';
 
@@ -15,25 +15,20 @@ const Header = () => {
   const isHome = location.pathname === '/';
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const scrollToSection = (id: string) => {
-    const doScroll = () => {
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    const go = () => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
       setIsMenuOpen(false);
     };
-
     if (!isHome) {
       navigate('/');
-      // pequena espera para o DOM da home montar:
-      setTimeout(doScroll, 120);
-    } else {
-      doScroll();
-    }
+      setTimeout(go, 120);
+    } else go();
   };
 
   const goToVendedorPage = () => {
@@ -42,37 +37,75 @@ const Header = () => {
   };
 
   return (
-    <>
+    // O bloco inteiro (topo + barra principal) gruda no topo e NÃO sobrepõe o conteúdo
+    <div className="sticky top-0 z-50">
       {/* Top Bar */}
-      <div className="bg-primary text-white py-2 px-4">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between text-sm">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-1">
-              <MapPin className="w-4 h-4" />
-              <span>Rua Ricardo Ramos, nº 9 - Planalto - Manaus</span>
+      <div className="bg-primary text-white">
+        <div className="max-w-7xl mx-auto px-4 py-2">
+          {/* Desktop: layout completo */}
+          <div className="hidden lg:flex flex-wrap items-center justify-between text-sm">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-1">
+                <MapPin className="w-4 h-4" />
+                <span>Rua Ricardo Ramos, nº 9 - Planalto - Manaus</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Phone className="w-4 h-4" />
+                <span>+55 92 3016-7065 | +55 92 99981-5891</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <Phone className="w-4 h-4" />
-              <span>+55 92 3016-7065 | +55 92 99981-5891</span>
+            <div className="flex items-center gap-4">
+              <a href="#" className="hover:text-blue-100 transition">Facebook</a>
+              <a
+                href="https://www.instagram.com/cbcomercialoficial?utm_source=ig_web_button_share_sheet&igsh=cmNxMjMzbmVqbWIz"
+                target="_blank" rel="noopener noreferrer"
+                className="hover:text-blue-100 transition"
+              >
+                Instagram
+              </a>
+              <a href="#" className="hover:text-blue-100 transition flex items-center gap-1">
+                <User className="w-4 h-4" />
+                <span>Área do Cliente</span>
+              </a>
+              <a href="#" className="hover:text-blue-100 transition flex items-center gap-1">
+                <ShoppingCart className="w-4 h-4" />
+                <span>Carrinho</span>
+              </a>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <a href="https://www.facebook.com/cbcomercialoficial" className="hover:text-blue-100 transition">Facebook</a>
-            <a href="https://www.instagram.com/cbcomercialoficial?utm_source=ig_web_button_share_sheet&igsh=cmNxMjMzbmVqbWIz" target="_blank" rel="noopener noreferrer" className="hover:text-blue-100 transition">Instagram</a>
-            <a href="#" className="hover:text-blue-100 transition flex items-center gap-1">
-              <User className="w-4 h-4" />
-              <span>Área do Cliente</span>
-            </a>
-            <a href="#" className="hover:text-blue-100 transition flex items-center gap-1">
-              <ShoppingCart className="w-4 h-4" />
-              <span>Carrinho</span>
-            </a>
+
+          {/* Mobile: ticker rolando */}
+          <div className="lg:hidden overflow-hidden">
+            <div className="flex items-center gap-8 whitespace-nowrap animate-marquee will-change-transform">
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="w-4 h-4" />
+                Rua Ricardo Ramos, nº 9 - Planalto - Manaus
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <Phone className="w-4 h-4" /> +55 92 3016-7065 | +55 92 99981-5891
+              </span>
+              <a
+                href="https://www.instagram.com/cbcomercialoficial?utm_source=ig_web_button_share_sheet&igsh=cmNxMjMzbmVqbWIz"
+                target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 hover:text-blue-100"
+              >
+                <Instagram className="w-4 h-4" /> @cbcomercialoficial
+              </a>
+              {/* duplica para loop contínuo */}
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="w-4 h-4" />
+                Rua Ricardo Ramos, nº 9 - Planalto - Manaus
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <Phone className="w-4 h-4" /> +55 92 3016-7065 | +55 92 99981-5891
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Header */}
-      <header className={`fixed w-full z-50 transition-all duration-300 ${
+      <header className={`transition-all duration-300 ${
         isScrolled ? 'bg-white shadow-lg py-2' : 'bg-white/95 backdrop-blur-sm py-4'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -82,17 +115,17 @@ const Header = () => {
               <img
                 src={withBase('logotipo.png')}
                 alt="CB Comercial"
-                className="h-10 w-auto animated-logo"
+                className="h-10 w-auto"
               />
-              <div>
+              <div className="leading-tight">
                 <h1 className="text-xl font-bold text-gray-900">CB Comercial</h1>
                 <p className="text-sm text-gray-600">Distribuidora de Alimentos</p>
               </div>
             </div>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Nav */}
             <nav className="hidden lg:flex items-center space-x-8">
-              {['inicio', 'empresa', 'produtos', 'fornecedores', 'contato'].map((id) => (
+              {['inicio','empresa','produtos','fornecedores','contato'].map((id) => (
                 <button
                   key={id}
                   onClick={() => scrollToSection(id)}
@@ -109,7 +142,7 @@ const Header = () => {
               </button>
             </nav>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -119,11 +152,11 @@ const Header = () => {
             </button>
           </div>
 
-          {/* Mobile Navigation */}
+          {/* Mobile Nav */}
           {isMenuOpen && (
-            <div className="lg:hidden mt-4 pb-4 border-t border-gray-200">
+            <div className="lg:hidden mt-3 pb-4 border-t border-gray-200 animate-slide-down">
               <nav className="flex flex-col space-y-2 pt-4">
-                {['inicio', 'empresa', 'produtos', 'fornecedores', 'contato'].map((id) => (
+                {['inicio','empresa','produtos','fornecedores','contato'].map((id) => (
                   <button
                     key={id}
                     onClick={() => scrollToSection(id)}
@@ -143,7 +176,7 @@ const Header = () => {
           )}
         </div>
       </header>
-    </>
+    </div>
   );
 };
 

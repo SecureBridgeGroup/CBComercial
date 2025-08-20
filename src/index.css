@@ -3,53 +3,80 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    @apply font-sans;
-    line-height: 1.6;
-  }
+  * { scroll-behavior: smooth; }
+  body { @apply font-sans; line-height: 1.6; }
 }
 
+/* ===== Utilities extras ===== */
 @layer utilities {
-  .animation-delay-1000 {
-    animation-delay: 1s;
-  }
+  .animation-delay-1000 { animation-delay: 1s; }
+  .animation-delay-2000 { animation-delay: 2s; }
 
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
+  /* Ticker do topo */
+  .animate-marquee { animation: marquee 16s linear infinite; will-change: transform; }
+  .animate-marquee-slow { animation: marquee 24s linear infinite; will-change: transform; }
+
+  /* Slide down (menu mobile) */
+  .animate-slide-down { animation: slide-down 160ms ease-out; }
+
+  /* Logo sutil */
+  .animated-logo { transition: transform .3s ease, filter .3s ease; }
+  .animated-logo:hover { transform: translateY(-1px) scale(1.02); filter: drop-shadow(0 2px 6px rgba(0,0,0,.15)); }
+
+  /* Swiper full-height no Hero */
+  .hero-swiper,
+  .hero-swiper .swiper,
+  .hero-swiper .swiper-slide { height: 100%; }
+  .hero-swiper img { width: 100%; height: 100%; object-fit: cover; }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* ===== Marquee infinito e suave (fornecedores) ===== */
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); } /* conteúdo duplicado → metade do track */
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
+.marquee-track {
+  display: inline-flex;              /* largura = conteúdo */
+  --marquee-duration: 48s;           /* duração base (mobile) */
+  animation: marquee-x var(--marquee-duration) linear infinite;
+  will-change: transform;
+}
+.marquee-track--slow { --marquee-duration: 55s; }
+.marquee-track--fast { --marquee-duration: 40s; }
+.marquee-track--rev  { animation-direction: reverse; }
+.marquee-track:hover { animation-play-state: paused; }
+
+/* espaço entre cards dentro do track */
+.marquee-gap > * + * { margin-left: 1.5rem; } /* ~ space-x-6 */
+
+/* Deixa mais suave em telas maiores */
+@media (min-width: 768px) { .marquee-track { --marquee-duration: 55s; } }
+@media (min-width: 1024px){ .marquee-track { --marquee-duration: 65s; } }
+
+/* ===== Keyframes auxiliares ===== */
+@keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-::-webkit-scrollbar-thumb {
-  @apply bg-primary rounded;
-}
+/* ===== Custom scrollbar ===== */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { @apply bg-primary rounded; }
+::-webkit-scrollbar-thumb:hover { @apply bg-blue-800; }
 
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-blue-800;
-}
+/* ===== Transições e foco ===== */
+button, a { transition: all 0.3s ease; }
+button:focus, a:focus, input:focus, textarea:focus { @apply outline-primary outline-2 outline-offset-2; }
 
-/* Smooth transitions for all interactive elements */
-button,
-a {
-  transition: all 0.3s ease;
-}
-
-/* Focus states for accessibility */
-button:focus,
-a:focus,
-input:focus,
-textarea:focus {
-  @apply outline-primary outline-2 outline-offset-2;
+/* ===== Acessibilidade: reduzir movimento ===== */
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto; }
+  .animate-marquee,
+  .animate-marquee-slow,
+  .animate-slide-down,
+  .marquee-track { animation: none !important; }
 }
