@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Menu, X, ShoppingCart, User, Phone, MapPin, Instagram } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Menu, X, User, Phone, MapPin, Instagram } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { basePath } from '../utils/basePath';
+import { isAuthed, clearToken, TOKEN_KEY } from '../utils/api';
+import { CartButton, CartDrawer } from '../Cart/CartSystem'; // ⬅️ novo
 
 const withBase = (p: string) =>
   `${String(basePath || import.meta.env.BASE_URL || '/').replace(/\/?$/, '/')}${p.replace(/^\/+/, '')}`;
@@ -9,6 +11,13 @@ const withBase = (p: string) =>
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [authed, setAuthed] = useState(isAuthed());
+  const [showAccount, setShowAccount] = useState(false);
+
+  // controla o drawer do carrinho
+  const [openCart, setOpenCart] = useState(false); // ⬅️ novo
+
+  const accountRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,6 +27,28 @@ const Header = () => {
     const onScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // mantém o estado de login em sincronia
+  useEffect(() => {
+    const sync = () => setAuthed(isAuthed());
+    sync();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === TOKEN_KEY) sync();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [location.pathname]);
+
+  // fecha o dropdown ao clicar fora
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+        setShowAccount(false);
+      }
+    };
+    document.addEventListener('click', onDocClick);
+    return () => document.removeEventListener('click', onDocClick);
   }, []);
 
   const scrollToSection = (id: string) => {
@@ -36,13 +67,25 @@ const Header = () => {
     navigate('/solicite-vendedor');
   };
 
+  const goCliente = () => {
+    setIsMenuOpen(false);
+    navigate('/cliente'); // gateway
+  };
+
+  const handleLogout = () => {
+    clearToken();
+    setShowAccount(false);
+    setIsMenuOpen(false);
+    setAuthed(false);
+    navigate('/cliente', { replace: true });
+  };
+
   return (
-    // O bloco inteiro (topo + barra principal) gruda no topo e NÃO sobrepõe o conteúdo
     <div className="sticky top-0 z-50">
       {/* Top Bar */}
       <div className="bg-primary text-white">
         <div className="max-w-7xl mx-auto px-4 py-2">
-          {/* Desktop: layout completo */}
+          {/* Desktop */}
           <div className="hidden lg:flex flex-wrap items-center justify-between text-sm">
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-1">
@@ -54,6 +97,7 @@ const Header = () => {
                 <span>+55 92 3016-7065 | +55 92 99981-5891</span>
               </div>
             </div>
+
             <div className="flex items-center gap-4">
               <a href="#" className="hover:text-blue-100 transition">Facebook</a>
               <a
@@ -63,18 +107,56 @@ const Header = () => {
               >
                 Instagram
               </a>
-              <a href="#" className="hover:text-blue-100 transition flex items-center gap-1">
-                <User className="w-4 h-4" />
-                <span>Área do Cliente</span>
-              </a>
-              <a href="#" className="hover:text-blue-100 transition flex items-center gap-1">
-                <ShoppingCart className="w-4 h-4" />
-                <span>Carrinho</span>
-              </a>
+
+              {/* Área do Cliente / Minha conta */}
+              {!authed ? (
+                <button onClick={goCliente} className="hover:text-blue-100 transition flex items-center gap-1">
+                  <User className="w-4 h-4" />
+                  <span>Área do Cliente</span>
+                </button>
+              ) : (
+                <div className="relative z-[61]" ref={accountRef}>
+                  <button
+                    onClick={() => setShowAccount(v => !v)}
+                    className="hover:text-blue-100 transition flex items-center gap-1"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Minha conta</span>
+                  </button>
+
+                  {showAccount && (
+                    <div className="absolute right-0 mt-2 w-56 rounded-lg bg-white shadow-xl ring-1 ring-black/5 z-[60]">
+                      <button
+                        onClick={() => { setShowAccount(false); navigate('/cliente/area/pedidos'); }}
+                        className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-50"
+                      >
+                        Meus pedidos
+                      </button>
+                      <button
+                        onClick={() => { setShowAccount(false); navigate('/cliente/area/cadastro'); }}
+                        className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-50"
+                      >
+                        Meu cadastro
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
+                      >
+                        Sair
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Carrinho – abre o Drawer e mostra badge de itens */}
+              <div className="ml-1">
+                <CartButton onClick={() => setOpenCart(true)} />
+              </div>
             </div>
           </div>
 
-          {/* Mobile: ticker rolando */}
+          {/* Mobile ticker */}
           <div className="lg:hidden overflow-hidden">
             <div className="flex items-center gap-8 whitespace-nowrap animate-marquee will-change-transform">
               <span className="inline-flex items-center gap-1">
@@ -91,7 +173,7 @@ const Header = () => {
               >
                 <Instagram className="w-4 h-4" /> @cbcomercialoficial
               </a>
-              {/* duplica para loop contínuo */}
+              {/* duplicado para loop contínuo */}
               <span className="inline-flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
                 Rua Ricardo Ramos, nº 9 - Planalto - Manaus
@@ -105,18 +187,14 @@ const Header = () => {
       </div>
 
       {/* Main Header */}
-      <header className={`transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-lg py-2' : 'bg-white/95 backdrop-blur-sm py-4'
-      }`}>
+      <header
+        className={`transition-all duration-300 ${isScrolled ? 'bg-white shadow-lg py-2' : 'bg-white/95 backdrop-blur-sm py-4'}`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-3 cursor-pointer" onClick={() => scrollToSection('inicio')}>
-              <img
-                src={withBase('logotipo.png')}
-                alt="CB Comercial"
-                className="h-10 w-auto"
-              />
+              <img src={withBase('logotipo.png')} alt="CB Comercial" className="h-10 w-auto" />
               <div className="leading-tight">
                 <h1 className="text-xl font-bold text-gray-900">CB Comercial</h1>
                 <p className="text-sm text-gray-600">Distribuidora de Alimentos</p>
@@ -125,7 +203,7 @@ const Header = () => {
 
             {/* Desktop Nav */}
             <nav className="hidden lg:flex items-center space-x-8">
-              {['inicio','empresa','produtos','fornecedores','contato'].map((id) => (
+              {['inicio', 'empresa', 'produtos', 'fornecedores', 'contato'].map((id) => (
                 <button
                   key={id}
                   onClick={() => scrollToSection(id)}
@@ -156,7 +234,7 @@ const Header = () => {
           {isMenuOpen && (
             <div className="lg:hidden mt-3 pb-4 border-t border-gray-200 animate-slide-down">
               <nav className="flex flex-col space-y-2 pt-4">
-                {['inicio','empresa','produtos','fornecedores','contato'].map((id) => (
+                {['inicio', 'empresa', 'produtos', 'fornecedores', 'contato'].map((id) => (
                   <button
                     key={id}
                     onClick={() => scrollToSection(id)}
@@ -165,9 +243,48 @@ const Header = () => {
                     {id === 'inicio' ? 'Início' : id.charAt(0).toUpperCase() + id.slice(1)}
                   </button>
                 ))}
+
+                {!authed ? (
+                  <button
+                    onClick={() => { setIsMenuOpen(false); goCliente(); }}
+                    className="flex items-center gap-2 border border-gray-300 rounded-lg py-3 px-3 text-gray-700 hover:bg-gray-100"
+                  >
+                    <User className="w-5 h-5" /> Área do Cliente
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => { setIsMenuOpen(false); navigate('/cliente/area/pedidos'); }}
+                      className="text-left text-gray-700 hover:text-primary transition-colors font-medium py-2"
+                    >
+                      Meus pedidos
+                    </button>
+                    <button
+                      onClick={() => { setIsMenuOpen(false); navigate('/cliente/area/cadastro'); }}
+                      className="text-left text-gray-700 hover:text-primary transition-colors font-medium py-2"
+                    >
+                      Meu cadastro
+                    </button>
+                    <button
+                      onClick={() => { setIsMenuOpen(false); handleLogout(); }}
+                      className="text-left text-red-600 hover:text-red-700 transition-colors font-medium py-2"
+                    >
+                      Sair
+                    </button>
+                  </>
+                )}
+
+                {/* Carrinho no menu mobile (abre o drawer) */}
+                <button
+                  onClick={() => { setIsMenuOpen(false); setOpenCart(true); }}
+                  className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors font-medium text-center"
+                >
+                  Abrir Carrinho
+                </button>
+
                 <button
                   onClick={goToVendedorPage}
-                  className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors font-medium text-center mt-4"
+                  className="bg-primary/90 text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors font-medium text-center"
                 >
                   Solicitar Vendedor
                 </button>
@@ -176,6 +293,9 @@ const Header = () => {
           )}
         </div>
       </header>
+
+      {/* Drawer do Carrinho (fica no fim pra sobrepor tudo) */}
+      <CartDrawer open={openCart} onClose={() => setOpenCart(false)} />
     </div>
   );
 };

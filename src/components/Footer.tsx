@@ -1,9 +1,23 @@
 import { Facebook, Instagram, Mail, Phone, MapPin } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { basePath } from '../utils/basePath';
+
+const withBase = (p: string) =>
+  `${String(basePath || import.meta.env.BASE_URL || '/').replace(/\/?$/, '/')}${p.replace(/^\/+/, '')}`;
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    element?.scrollIntoView({ behavior: 'smooth' });
+    const go = () => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    if (!isHome) {
+      navigate('/');
+      setTimeout(go, 120);
+    } else {
+      go();
+    }
   };
 
   return (
@@ -16,7 +30,11 @@ const Footer = () => {
           {/* Company Info */}
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <img src="./logotipobranco.png" alt="CB" className="w-20 h-10 object-contain" />
+              <img
+                src={withBase('logotipobranco.png')}
+                alt="CB"
+                className="w-20 h-10 object-contain"
+              />
               <div>
                 <h3 className="text-xl font-bold">CB Comercial</h3>
                 <p className="text-gray-400 text-sm">Distribuidora de Alimentos</p>
@@ -36,7 +54,7 @@ const Footer = () => {
               </a>
               <a
                 href="https://www.facebook.com/cbcomercialoficial"
-                 target="_blank"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-blue-800 transition-all duration-300 transform hover:scale-110"
               >

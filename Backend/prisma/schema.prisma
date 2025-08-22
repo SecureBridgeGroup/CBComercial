@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"      // troque para "postgresql" se quiser
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String   // hash
+  cpf       String?  @unique
+  cnpj      String?  @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relações
+  orders     Order[]
+  addresses  Address[]     // ✅ faltava
+  tickets    Ticket[]      // ✅ faltava
+}
+
+model Order {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  totalCents Int      // 125000 = R$ 1.250,00
+  status     String
+  date       DateTime @default(now())
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+
+  docs       Doc[]    // ✅ faltava lado oposto de Doc.order
+}
+
+model Address {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+
+  label             String   // "Comercial", "Entrega", etc.
+  street            String
+  number            String?
+  complement        String?
+  district          String
+  city              String
+  state             String   // "AM"
+  cep               String
+
+  isDefaultShipping Boolean  @default(false)  // ✅ usar estes campos
+  isDefaultBilling  Boolean  @default(false)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Doc {
+  id          String   @id @default(cuid())
+  type        String   // "NFE" | "BOLETO"
+  number      String?
+  dueDate     DateTime?
+  amountCents Int
+  status      String   // "PAGO" | "EM_ABERTO"
+  pdfUrl      String?
+  line        String?  // linha digitável, se boleto
+
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Ticket {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  subject   String
+  status    String   @default("ABERTO") // ABERTO/EM_ANDAMENTO/RESOLVIDO
+  createdAt DateTime @default(now())
+
+  messages  TicketMessage[]
+}
+
+model TicketMessage {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  fromUser  Boolean  @default(true)
+  content   String
+  createdAt DateTime @default(now())
+}

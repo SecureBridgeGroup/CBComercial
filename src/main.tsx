@@ -4,10 +4,14 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import './index.css';
 
+import { CartProvider } from './Cart/CartSystem'; // ⬅️ novo
+
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter basename="/CBComercial">
     <StrictMode>
-      <App />
+      <CartProvider>
+        <App />
+      </CartProvider>
     </StrictMode>
   </BrowserRouter>
 );
