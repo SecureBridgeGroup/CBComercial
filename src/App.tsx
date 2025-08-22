@@ -10,13 +10,12 @@ import Suppliers from './components/Suppliers';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Mascot from './components/Mascot';
-import SoliciteVendedor from './pages/SoliciteVendedor';
 
 /** Área do Cliente */
 import ClienteLayout from './pages/ClienteLayout';
 import ClienteGateway from './pages/ClienteGateway';
 import ClienteLogin from './pages/ClienteLogin';
-import ClienteCadastro from './pages/ClienteCadastro'; // público
+import ClienteCadastro from './pages/ClienteCadastro';
 import ClientePedidos from './pages/ClientePedidos';
 import ClienteEnderecos from './pages/ClienteEnderecos';
 import ClienteFinanceiro from './pages/ClienteFinanceiro';
@@ -24,6 +23,8 @@ import ClienteSuporte from './pages/ClienteSuporte';
 import ClienteSenha from './pages/ClienteSenha';
 import ClienteDados from './pages/ClienteDados';
 import ProtectedRoute from './components/ProtectedRoute';
+import SoliciteVendedor from './pages/SoliciteVendedor';
+import Pagamento from './pages/Pagamento';
 
 /** Placeholder rápido para o carrinho por enquanto */
 const Placeholder = ({ title }: { title: string }) => (
@@ -56,9 +57,9 @@ function App() {
       <Header />
 
       <Routes>
-        {/* Home */}
+        {/* Home (raiz) */}
         <Route
-          path="/"
+          path=""
           element={
             <>
               <Hero />
@@ -71,16 +72,19 @@ function App() {
         />
 
         {/* Página pública */}
-        <Route path="/solicite-vendedor" element={<SoliciteVendedor />} />
+        <Route path="solicite-vendedor" element={<SoliciteVendedor />} />
 
-        {/* Área do Cliente – páginas públicas */}
-        <Route path="/cliente" element={<ClienteGateway />} />
-        <Route path="/cliente/login" element={<ClienteLogin />} />
-        <Route path="/cliente/cadastro" element={<ClienteCadastro />} />
+        {/* >>> Pagamento no nível raiz (URL limpa) <<< */}
+        <Route path="pagamento/:code" element={<Pagamento />} />
+
+        {/* Área do Cliente – públicas */}
+        <Route path="cliente" element={<ClienteGateway />} />
+        <Route path="cliente/login" element={<ClienteLogin />} />
+        <Route path="cliente/cadastro" element={<ClienteCadastro />} />
 
         {/* Área do Cliente – protegida */}
         <Route
-          path="/cliente/area"
+          path="cliente/area"
           element={
             <ProtectedRoute>
               <ClienteLayout />
@@ -88,23 +92,22 @@ function App() {
           }
         >
           <Route index element={<Navigate to="pedidos" replace />} />
-
           {/* Dados / Atualização de cadastro */}
           <Route path="dados" element={<ClienteDados />} />
-          {/* Alias para a aba "Cadastro" */}
           <Route path="cadastro" element={<Navigate to="../dados" replace />} />
-
           {/* Abas */}
           <Route path="pedidos" element={<ClientePedidos />} />
           <Route path="enderecos" element={<ClienteEnderecos />} />
           <Route path="financeiro" element={<ClienteFinanceiro />} />
           <Route path="suporte" element={<ClienteSuporte />} />
           <Route path="senha" element={<ClienteSenha />} />
+          <Route path="produtos" element={<Products fullPage />} />
+          {/* (NADA de rota absoluta aqui) */}
         </Route>
 
-        {/* Carrinho protegido */}
+        {/* Carrinho protegido (placeholder) */}
         <Route
-          path="/carrinho"
+          path="carrinho"
           element={
             <ProtectedRoute>
               <Placeholder title="Carrinho" />
@@ -113,7 +116,7 @@ function App() {
         />
 
         {/* 404 */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="" replace />} />
       </Routes>
 
       <Footer />

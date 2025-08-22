@@ -131,9 +131,26 @@ const Footer = () => {
         <div className="border-t border-blue-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
             <p>© 2025 CB COMERCIAL. Todos os Direitos Reservados.</p>
-            <p className="mt-4 md:mt-0">Desenvolvido por SB DevSolutions</p>
+
+            <p className="mt-4 md:mt-0 text-gray-300 credit-brand-hover">
+              Desenvolvido por{" "}
+              <span
+                className="
+      credit-brand                 /* underline animado */
+      font-extrabold
+      text-transparent bg-clip-text
+      bg-gradient-to-r from-primary via-pink-500 to-yellow-400
+      animate-gradient-move
+      shine-text text-glow         /* brilho deslizante + glow pulsante */
+      hover:shine-fast             /* acelera o shine no hover (classe extra via CSS) */
+    "
+              >
+                SB DevSolutions
+              </span>
+            </p>
           </div>
         </div>
+
       </div>
     </footer>
   );

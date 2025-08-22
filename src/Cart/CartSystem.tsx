@@ -2,35 +2,27 @@ import React, { createContext, useContext, useEffect, useMemo, useReducer, useSt
 import { ShoppingCart, Trash2, X, Plus, Minus } from "lucide-react";
 
 /**
- * CB Comercial – Cart System (single-file)
- * - Context + reducer with localStorage persistence
- * - <CartButton /> badge in header
- * - <CartDrawer /> slide-over mini-cart
- * - useCart() hook to add/remove/update from any component
- *
- * Currency: BRL (centavos). Use priceCents across the app for accuracy.
+ * CB Comercial – Cart System
+ * - Context + reducer + localStorage
+ * - <CartButton /> com badge
+ * - <CartDrawer /> com callback onCheckout (gera pedido e redireciona)
  */
 
-// -------------------- Types & Utils --------------------
 export type CartLine = {
-  id: string; // product id
+  id: string;             // product id
   name: string;
-  priceCents: number; // unit price in centavos
+  priceCents: number;     // unit price in centavos
   imageUrl?: string;
-  qty: number; // integer >= 1
+  qty: number;            // integer >= 1
 };
 
-export type CartState = {
-  lines: CartLine[];
-};
+export type CartState = { lines: CartLine[] };
 
 const BRL = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const fmt = (cents: number) => BRL.format(cents / 100);
-
 const STORAGE_KEY = "cbcomercial-cart-v1";
 
 // -------------------- Reducer --------------------
-
 type Action =
   | { type: "ADD"; line: Omit<CartLine, "qty"> & { qty?: number } }
   | { type: "REMOVE"; id: string }
@@ -49,9 +41,8 @@ function cartReducer(state: CartState, action: Action): CartState {
       }
       return { lines: [...state.lines, { ...action.line, qty }] };
     }
-    case "REMOVE": {
+    case "REMOVE":
       return { lines: state.lines.filter(l => l.id !== action.id) };
-    }
     case "SET_QTY": {
       const lines = state.lines
         .map(l => (l.id === action.id ? { ...l, qty: Math.max(1, Math.floor(action.qty)) } : l))
@@ -66,7 +57,6 @@ function cartReducer(state: CartState, action: Action): CartState {
 }
 
 // -------------------- Context --------------------
-
 type CartContextType = {
   state: CartState;
   addItem: (line: Omit<CartLine, "qty"> & { qty?: number }) => void;
@@ -89,23 +79,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return { lines: [] } as CartState;
   });
 
-  useEffect(() => {
-    // avoid clobbering SSR/first render
-    setInitialized(true);
-  }, []);
-
+  useEffect(() => { setInitialized(true); }, []);
   useEffect(() => {
     if (!initialized) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
   }, [state, initialized]);
 
-  const totalCents = useMemo(
-    () => state.lines.reduce((sum, l) => sum + l.priceCents * l.qty, 0),
-    [state.lines]
-  );
-  const totalQty = useMemo(() => state.lines.reduce((sum, l) => sum + l.qty, 0), [state.lines]);
+  const totalCents = useMemo(() => state.lines.reduce((s, l) => s + l.priceCents * l.qty, 0), [state.lines]);
+  const totalQty   = useMemo(() => state.lines.reduce((s, l) => s + l.qty, 0), [state.lines]);
 
   const value: CartContextType = {
     state,
@@ -127,7 +108,6 @@ export function useCart() {
 }
 
 // -------------------- UI Components --------------------
-
 export function CartButton({ onClick }: { onClick?: () => void }) {
   const { totalQty } = useCart();
   return (
@@ -146,7 +126,18 @@ export function CartButton({ onClick }: { onClick?: () => void }) {
   );
 }
 
-export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+// callback usado pelo Header para “fechar pedido”
+export type CheckoutHandler = (args: { lines: CartLine[]; totalCents: number }) => Promise<void> | void;
+
+export function CartDrawer({
+  open,
+  onClose,
+  onCheckout, // novo
+}: {
+  open: boolean;
+  onClose: () => void;
+  onCheckout?: CheckoutHandler;
+}) {
   const { state, setQty, removeItem, totalCents, clear } = useCart();
 
   return (
@@ -220,17 +211,22 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
             <span className="text-xl font-bold">{fmt(totalCents)}</span>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-3">
-            <button
-              onClick={clear}
-              className="rounded-xl border px-4 py-2 text-sm hover:bg-gray-50"
-            >
+            <button onClick={clear} className="rounded-xl border px-4 py-2 text-sm hover:bg-gray-50">
               Limpar
             </button>
             <button
-              onClick={() => alert("Checkout em breve ")}
+              onClick={async () => {
+                if (!state.lines.length) return;
+                if (onCheckout) {
+                  await onCheckout({ lines: state.lines, totalCents });
+                  onClose();
+                } else {
+                  alert("Checkout indisponível no momento.");
+                }
+              }}
               className="rounded-xl bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-700 shadow"
             >
-              Finalizar Pedido
+              Fechar pedido
             </button>
           </div>
         </footer>
@@ -239,84 +235,4 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   );
 }
 
-// -------------------- Example: Hooking into Header --------------------
-
-/**
- * Drop these where you need:
- *
- * 1) Wrap your app once:
- *    <CartProvider>
- *      <App />
- *    </CartProvider>
- *
- * 2) In the Header component:
- *    const [open, setOpen] = useState(false);
- *    ...
- *    <CartButton onClick={() => setOpen(true)} />
- *    <CartDrawer open={open} onClose={() => setOpen(false)} />
- *
- * 3) From any ProductCard:
- *    const { addItem } = useCart();
- *    addItem({ id, name, priceCents, imageUrl, qty: 1 });
- */
-
-export default function DemoArea() {
-  // This DemoArea is optional; remove in production.
-  const [open, setOpen] = useState(false);
-  return (
-    <CartProvider>
-      <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">CB Comercial – Demo Carrinho</h1>
-          <CartButton onClick={() => setOpen(true)} />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <ProductCard
-            id="arroz-5kg"
-            name="Arroz Branco Tipo 1 5kg"
-            priceCents={2599}
-            imageUrl="https://images.unsplash.com/photo-1604908176997-4314a02e46a8?q=80&w=800&auto=format&fit=crop"
-          />
-          <ProductCard
-            id="feijao-1kg"
-            name="Feijão Carioca 1kg"
-            priceCents={1299}
-            imageUrl="https://images.unsplash.com/photo-1514512364185-4c2b1a0b49b3?q=80&w=800&auto=format&fit=crop"
-          />
-          <ProductCard
-            id="oleo-900ml"
-            name="Óleo de Soja 900ml"
-            priceCents={899}
-            imageUrl="https://images.unsplash.com/photo-1505577080450-7a4e3f1f0572?q=80&w=800&auto=format&fit=crop"
-          />
-        </div>
-      </div>
-
-      <CartDrawer open={open} onClose={() => setOpen(false)} />
-    </CartProvider>
-  );
-}
-
-function ProductCard({ id, name, priceCents, imageUrl }: Omit<CartLine, "qty">) {
-  const { addItem } = useCart();
-  return (
-    <div className="rounded-2xl border overflow-hidden shadow-sm">
-      {imageUrl ? (
-        <img src={imageUrl} alt={name} className="h-40 w-full object-cover" />
-      ) : (
-        <div className="h-40 w-full bg-gray-100" />)
-      }
-      <div className="p-4">
-        <div className="font-semibold leading-tight">{name}</div>
-        <div className="text-blue-700 font-bold">{fmt(priceCents)}</div>
-        <button
-          onClick={() => addItem({ id, name, priceCents, imageUrl, qty: 1 })}
-          className="mt-3 w-full rounded-xl bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-700 shadow"
-        >
-          Adicionar ao carrinho
-        </button>
-      </div>
-    </div>
-  );
-}
+// (DemoArea e ProductCard podem ser removidos em produção)

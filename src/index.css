@@ -37,8 +37,8 @@
 }
 
 .marquee-track {
-  display: inline-flex;              /* largura = conteúdo */
-  --marquee-duration: 48s;           /* duração base (mobile) */
+  display: inline-flex;
+  --marquee-duration: 48s;
   animation: marquee-x var(--marquee-duration) linear infinite;
   will-change: transform;
 }
@@ -48,7 +48,7 @@
 .marquee-track:hover { animation-play-state: paused; }
 
 /* espaço entre cards dentro do track */
-.marquee-gap > * + * { margin-left: 1.5rem; } /* ~ space-x-6 */
+.marquee-gap > * + * { margin-left: 1.5rem; }
 
 /* Deixa mais suave em telas maiores */
 @media (min-width: 768px) { .marquee-track { --marquee-duration: 55s; } }
@@ -79,4 +79,90 @@ button:focus, a:focus, input:focus, textarea:focus { @apply outline-primary outl
   .animate-marquee-slow,
   .animate-slide-down,
   .marquee-track { animation: none !important; }
+}
+
+/* ===== Gradiente correndo (melhora o bg-clip-text) ===== */
+.bg-clip-text { background-size: 200% 200%; }
+
+/* ===== Shine effect aplicado no span (SUAVE) ===== */
+.shine-text { position: relative; }
+.shine-text::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 120%;               /* faixa larga, atravessa suave */
+  height: 100%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(255,255,255,0.28) 44%,
+    rgba(255,255,255,0.45) 50%,   /* ápice translúcido */
+    rgba(255,255,255,0.28) 56%,
+    transparent 100%
+  );
+  filter: blur(6px);          /* borda difusa */
+  animation: shine 3.8s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+@keyframes shine {
+  0%   { left: -150%; }
+  100% { left: 150%; }
+}
+
+/* ==== Glow suave no texto (pulsa) ==== */
+.text-glow {
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.15));
+  animation: glowPulse 3.2s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%,100% { filter: drop-shadow(0 0 6px rgba(255,255,255,0.15)); }
+  50%     { filter: drop-shadow(0 0 12px rgba(255,255,255,0.35)); }
+}
+
+/* ==== Underline animado passando por baixo ==== */
+.credit-brand {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 2px; /* espaço pro underline */
+}
+.credit-brand::before {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 1.5px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  filter: blur(0.6px);
+  animation: underlineSweep 2.6s ease-in-out infinite;
+}
+@keyframes underlineSweep {
+  0%   { transform: scaleX(0); opacity: .0; }
+  15%  { transform: scaleX(.25); opacity: .4; }
+  40%  { transform: scaleX(1); opacity: .85; }
+  65%  { transform: scaleX(.25); opacity: .4; transform-origin: right center; }
+  100% { transform: scaleX(0); opacity: 0; transform-origin: right center; }
+}
+
+/* ==== Hover turbo (acelera e dá leve scale) ==== */
+.credit-brand-hover:hover .credit-brand {
+  transform: translateZ(0) scale(1.03);
+}
+
+/* acelera o shine quando o mouse passa */
+.credit-brand-hover:hover .shine-text::after {
+  animation-duration: 2s; /* de 3.8s → 2s no hover */
+}
+
+/* glow pulsa mais rápido no hover */
+.credit-brand-hover:hover .text-glow {
+  animation-duration: 1.8s;
+}
+
+/* Suaviza transform/opacity do crédito */
+.credit-brand, .credit-brand * {
+  transition: transform .35s ease, opacity .35s ease, filter .35s ease;
 }

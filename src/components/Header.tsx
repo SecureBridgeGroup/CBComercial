@@ -3,7 +3,7 @@ import { Menu, X, User, Phone, MapPin, Instagram } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { basePath } from '../utils/basePath';
 import { isAuthed, clearToken, TOKEN_KEY } from '../utils/api';
-import { CartButton, CartDrawer } from '../Cart/CartSystem'; // ⬅️ novo
+import { CartButton, CartDrawer } from '../Cart/CartSystem';
 
 const withBase = (p: string) =>
   `${String(basePath || import.meta.env.BASE_URL || '/').replace(/\/?$/, '/')}${p.replace(/^\/+/, '')}`;
@@ -13,9 +13,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [authed, setAuthed] = useState(isAuthed());
   const [showAccount, setShowAccount] = useState(false);
-
-  // controla o drawer do carrinho
-  const [openCart, setOpenCart] = useState(false); // ⬅️ novo
+  const [openCart, setOpenCart] = useState(false);
 
   const accountRef = useRef<HTMLDivElement>(null);
 
@@ -29,48 +27,29 @@ const Header = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // mantém o estado de login em sincronia
   useEffect(() => {
     const sync = () => setAuthed(isAuthed());
     sync();
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === TOKEN_KEY) sync();
-    };
+    const onStorage = (e: StorageEvent) => { if (e.key === TOKEN_KEY) sync(); };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
   }, [location.pathname]);
 
-  // fecha o dropdown ao clicar fora
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
-      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
-        setShowAccount(false);
-      }
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) setShowAccount(false);
     };
     document.addEventListener('click', onDocClick);
     return () => document.removeEventListener('click', onDocClick);
   }, []);
 
   const scrollToSection = (id: string) => {
-    const go = () => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-      setIsMenuOpen(false);
-    };
-    if (!isHome) {
-      navigate('/');
-      setTimeout(go, 120);
-    } else go();
+    const go = () => { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); setIsMenuOpen(false); };
+    if (!isHome) { navigate('/'); setTimeout(go, 120); } else go();
   };
 
-  const goToVendedorPage = () => {
-    setIsMenuOpen(false);
-    navigate('/solicite-vendedor');
-  };
-
-  const goCliente = () => {
-    setIsMenuOpen(false);
-    navigate('/cliente'); // gateway
-  };
+  const goToVendedorPage = () => { setIsMenuOpen(false); navigate('/solicite-vendedor'); };
+  const goCliente = () => { setIsMenuOpen(false); navigate('/cliente'); };
 
   const handleLogout = () => {
     clearToken();
@@ -79,6 +58,39 @@ const Header = () => {
     setAuthed(false);
     navigate('/cliente', { replace: true });
   };
+
+  // === Checkout: cria pedido no backend e redireciona para /pagamento/:code
+  async function checkout({ lines, totalCents }: { lines: Array<{id: string; name: string; priceCents: number; qty: number}>; totalCents: number }) {
+    try {
+      const payload = {
+        items: lines.map(l => ({
+          productId: l.id,
+          name: l.name,
+          unitPriceCents: l.priceCents,
+          qty: l.qty,
+          lineTotalCents: l.priceCents * l.qty,
+        })),
+        totalCents,
+      };
+
+      const res = await fetch('/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem(TOKEN_KEY) ? { Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}` } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error('Falha ao criar pedido');
+      const data = await res.json() as { order: { id: string; code: string } };
+
+      navigate(`/pagamento/${encodeURIComponent(data.order.code)}`);
+    } catch (e: any) {
+      console.error(e);
+      alert(e?.message || 'Não foi possível fechar o pedido.');
+    }
+  }
 
   return (
     <div className="sticky top-0 z-50">
@@ -108,7 +120,6 @@ const Header = () => {
                 Instagram
               </a>
 
-              {/* Área do Cliente / Minha conta */}
               {!authed ? (
                 <button onClick={goCliente} className="hover:text-blue-100 transition flex items-center gap-1">
                   <User className="w-4 h-4" />
@@ -149,7 +160,7 @@ const Header = () => {
                 </div>
               )}
 
-              {/* Carrinho – abre o Drawer e mostra badge de itens */}
+              {/* Carrinho */}
               <div className="ml-1">
                 <CartButton onClick={() => setOpenCart(true)} />
               </div>
@@ -173,7 +184,6 @@ const Header = () => {
               >
                 <Instagram className="w-4 h-4" /> @cbcomercialoficial
               </a>
-              {/* duplicado para loop contínuo */}
               <span className="inline-flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
                 Rua Ricardo Ramos, nº 9 - Planalto - Manaus
@@ -187,9 +197,7 @@ const Header = () => {
       </div>
 
       {/* Main Header */}
-      <header
-        className={`transition-all duration-300 ${isScrolled ? 'bg-white shadow-lg py-2' : 'bg-white/95 backdrop-blur-sm py-4'}`}
-      >
+      <header className={`transition-all duration-300 ${isScrolled ? 'bg-white shadow-lg py-2' : 'bg-white/95 backdrop-blur-sm py-4'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             {/* Logo */}
@@ -274,7 +282,6 @@ const Header = () => {
                   </>
                 )}
 
-                {/* Carrinho no menu mobile (abre o drawer) */}
                 <button
                   onClick={() => { setIsMenuOpen(false); setOpenCart(true); }}
                   className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors font-medium text-center"
@@ -294,8 +301,12 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Drawer do Carrinho (fica no fim pra sobrepor tudo) */}
-      <CartDrawer open={openCart} onClose={() => setOpenCart(false)} />
+      {/* Drawer do Carrinho */}
+      <CartDrawer
+        open={openCart}
+        onClose={() => setOpenCart(false)}
+        onCheckout={checkout}  // chama o fluxo: cria pedido e redireciona
+      />
     </div>
   );
 };

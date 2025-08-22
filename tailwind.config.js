@@ -19,19 +19,32 @@ export default {
         },
         marquee: {
           '0%': { transform: 'translateX(0%)' },
-          '100%': { transform: 'translateX(-50%)' }, // ← Aqui é o segredo!
+          '100%': { transform: 'translateX(-50%)' },
         },
         'marquee-reverse': {
           '0%': { transform: 'translateX(0%)' },
-          '100%': { transform: 'translateX(50%)' }, // ← Reverso da lógica
+          '100%': { transform: 'translateX(50%)' },
+        },
+
+        /* === NOVO: animações do crédito === */
+        gradientMove: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        shine: {
+          '0%': { left: '-75%' },
+          '100%': { left: '125%' },
         },
       },
       animation: {
         'fade-in-up': 'fadeInUp 1s ease-out',
         marquee: 'marquee 30s linear infinite',
         'marquee-reverse': 'marquee-reverse 30s linear infinite',
-      },
 
+        /* === NOVO: nomes sem colchete === */
+        'gradient-move': 'gradientMove 6s linear infinite',
+        shine: 'shine 3s infinite',
+      },
     },
   },
   plugins: [animate],
