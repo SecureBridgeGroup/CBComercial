@@ -1,7 +1,6 @@
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 
-/** Layout / seções públicas */
 import Header from './components/Header';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -11,7 +10,6 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Mascot from './components/Mascot';
 
-/** Área do Cliente */
 import ClienteLayout from './pages/ClienteLayout';
 import ClienteGateway from './pages/ClienteGateway';
 import ClienteLogin from './pages/ClienteLogin';
@@ -25,8 +23,10 @@ import ClienteDados from './pages/ClienteDados';
 import ProtectedRoute from './components/ProtectedRoute';
 import SoliciteVendedor from './pages/SoliciteVendedor';
 import Pagamento from './pages/Pagamento';
+import ProdutosPage from './pages/ProdutosPage';
+import ProdutoDetalhe from './pages/ProdutoDetalhe';
+import CategoriaProdutos from './pages/CategoriaProdutos';
 
-/** Placeholder rápido para o carrinho por enquanto */
 const Placeholder = ({ title }: { title: string }) => (
   <div className="text-gray-600">Em breve: {title}</div>
 );
@@ -41,15 +41,9 @@ function App() {
     <HelmetProvider>
       <Helmet>
         <title>CB Comercial — Distribuidora de Alimentos em Manaus</title>
-        <meta
-          name="description"
-          content="Qualidade e excelência no fornecimento de alimentos e materiais para padarias, hotéis, lanchonetes e restaurantes."
-        />
+        <meta name="description" content="Qualidade e excelência no fornecimento de alimentos e materiais para padarias, hotéis, lanchonetes e restaurantes." />
         <meta property="og:title" content="CB Comercial" />
-        <meta
-          property="og:description"
-          content="Distribuidora de Alimentos em Manaus — excelência, variedade e agilidade."
-        />
+        <meta property="og:description" content="Distribuidora de Alimentos em Manaus — excelência, variedade e agilidade." />
         <meta property="og:image" content="/og-cover.jpg" />
         <meta property="og:type" content="website" />
       </Helmet>
@@ -57,9 +51,9 @@ function App() {
       <Header />
 
       <Routes>
-        {/* Home (raiz) */}
+        {/* Home */}
         <Route
-          path=""
+          path="/"
           element={
             <>
               <Hero />
@@ -71,20 +65,25 @@ function App() {
           }
         />
 
-        {/* Página pública */}
-        <Route path="solicite-vendedor" element={<SoliciteVendedor />} />
+        {/* Produtos / Categorias / Detalhe */}
+        <Route path="/produtos" element={<ProdutosPage />} />
+        <Route path="/produto/:slug" element={<ProdutoDetalhe />} />
+        <Route path="/categoria/:slug" element={<CategoriaProdutos />} />
 
-        {/* >>> Pagamento no nível raiz (URL limpa) <<< */}
-        <Route path="pagamento/:code" element={<Pagamento />} />
+        {/* Página pública */}
+        <Route path="/solicite-vendedor" element={<SoliciteVendedor />} />
+
+        {/* Pagamento no nível raiz */}
+        <Route path="/pagamento/:code" element={<Pagamento />} />
 
         {/* Área do Cliente – públicas */}
-        <Route path="cliente" element={<ClienteGateway />} />
-        <Route path="cliente/login" element={<ClienteLogin />} />
-        <Route path="cliente/cadastro" element={<ClienteCadastro />} />
+        <Route path="/cliente" element={<ClienteGateway />} />
+        <Route path="/cliente/login" element={<ClienteLogin />} />
+        <Route path="/cliente/cadastro" element={<ClienteCadastro />} />
 
         {/* Área do Cliente – protegida */}
         <Route
-          path="cliente/area"
+          path="/cliente/area"
           element={
             <ProtectedRoute>
               <ClienteLayout />
@@ -92,22 +91,19 @@ function App() {
           }
         >
           <Route index element={<Navigate to="pedidos" replace />} />
-          {/* Dados / Atualização de cadastro */}
           <Route path="dados" element={<ClienteDados />} />
           <Route path="cadastro" element={<Navigate to="../dados" replace />} />
-          {/* Abas */}
           <Route path="pedidos" element={<ClientePedidos />} />
           <Route path="enderecos" element={<ClienteEnderecos />} />
           <Route path="financeiro" element={<ClienteFinanceiro />} />
           <Route path="suporte" element={<ClienteSuporte />} />
           <Route path="senha" element={<ClienteSenha />} />
-          <Route path="produtos" element={<Products fullPage />} />
-          {/* (NADA de rota absoluta aqui) */}
+          {/* 🚫 nada de /produtos, /produto/:slug, /categoria/:slug aqui dentro */}
         </Route>
 
-        {/* Carrinho protegido (placeholder) */}
+        {/* Carrinho protegido */}
         <Route
-          path="carrinho"
+          path="/carrinho"
           element={
             <ProtectedRoute>
               <Placeholder title="Carrinho" />
@@ -115,16 +111,14 @@ function App() {
           }
         />
 
-        {/* 404 */}
-        <Route path="*" element={<Navigate to="" replace />} />
+        {/* 404 → Home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       <Footer />
 
-      {/* Mascote só na home/públicas */}
       {!hideMascot && <Mascot />}
 
-      {/* Botão flutuante do WhatsApp */}
       <a
         href="https://wa.me/5592999815891"
         target="_blank"

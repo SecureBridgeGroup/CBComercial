@@ -44,6 +44,11 @@ const Header = () => {
   }, []);
 
   const scrollToSection = (id: string) => {
+    if (id === 'produtos') { // agora Produtos é página
+      setIsMenuOpen(false);
+      navigate('/produtos');
+      return;
+    }
     const go = () => { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); setIsMenuOpen(false); };
     if (!isHome) { navigate('/'); setTimeout(go, 120); } else go();
   };
@@ -59,7 +64,6 @@ const Header = () => {
     navigate('/cliente', { replace: true });
   };
 
-  // === Checkout: cria pedido no backend e redireciona para /pagamento/:code
   async function checkout({ lines, totalCents }: { lines: Array<{id: string; name: string; priceCents: number; qty: number}>; totalCents: number }) {
     try {
       const payload = {
@@ -214,7 +218,7 @@ const Header = () => {
               {['inicio', 'empresa', 'produtos', 'fornecedores', 'contato'].map((id) => (
                 <button
                   key={id}
-                  onClick={() => scrollToSection(id)}
+                  onClick={() => (id === 'produtos' ? navigate('/produtos') : scrollToSection(id))}
                   className="text-gray-700 hover:text-primary transition-colors font-medium"
                 >
                   {id === 'inicio' ? 'Início' : id.charAt(0).toUpperCase() + id.slice(1)}
@@ -245,7 +249,7 @@ const Header = () => {
                 {['inicio', 'empresa', 'produtos', 'fornecedores', 'contato'].map((id) => (
                   <button
                     key={id}
-                    onClick={() => scrollToSection(id)}
+                    onClick={() => { setIsMenuOpen(false); id === 'produtos' ? navigate('/produtos') : scrollToSection(id); }}
                     className="text-left text-gray-700 hover:text-primary transition-colors font-medium py-2"
                   >
                     {id === 'inicio' ? 'Início' : id.charAt(0).toUpperCase() + id.slice(1)}
@@ -305,7 +309,7 @@ const Header = () => {
       <CartDrawer
         open={openCart}
         onClose={() => setOpenCart(false)}
-        onCheckout={checkout}  // chama o fluxo: cria pedido e redireciona
+        onCheckout={checkout}
       />
     </div>
   );
