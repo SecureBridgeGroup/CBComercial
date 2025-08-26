@@ -8,10 +8,10 @@ const About = () => {
   const bgUrl = withBase('assets/capa-manaus.jpg');
 
   return (
-    <section id="empresa" className="py-20 bg-gray-50 scroll-mt-16">
+    <section id="empresa" className="py-16 md:py-20 bg-gray-50 scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Grid com imagem + texto */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Imagem com texto sobreposto */}
           <div className="relative">
             <div
@@ -22,18 +22,18 @@ const About = () => {
             >
               <div className="absolute inset-0 bg-black/40" />
               <div className="absolute inset-0 flex flex-col justify-center items-center text-white z-10 text-center px-4">
-                <h3 className="text-4xl font-bold mb-2">Excelência</h3>
-                <p className="text-xl">em Distribuição</p>
+                <h3 className="text-3xl md:text-4xl font-bold mb-2">Excelência</h3>
+                <p className="text-lg md:text-xl">em Distribuição</p>
               </div>
             </div>
           </div>
 
           {/* Texto descritivo ao lado */}
-          <div className="space-y-6 text-lg text-gray-700 leading-relaxed text-justify">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+          <div className="space-y-5 md:space-y-6 text-base md:text-lg text-gray-700 leading-relaxed text-justify">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 md:mb-6">
               A <span className="text-primary">Empresa</span>
             </h2>
-            <div className="w-24 h-1 bg-primary mb-6" />
+            <div className="w-20 md:w-24 h-1 bg-primary mb-4 md:mb-6" />
 
             <p>
               A CB Comercial atende com qualidade e excelência aos segmentos de <strong>padarias, pizzarias, docerias, cafeterias, cozinhas, hotéis, restaurantes, lanchonetes</strong> e muitos outros.
@@ -54,7 +54,7 @@ const About = () => {
         </div>
 
         {/* Cards com ícones */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mt-12 md:mt-16">
           {[
             { icon: Users, title: 'Equipe Qualificada', text: 'Mais de 80 profissionais especializados' },
             { icon: Truck, title: 'Logística Moderna', text: 'Frota nova para entregas rápidas' },
@@ -63,11 +63,11 @@ const About = () => {
           ].map(({ icon: Icon, title, text }) => (
             <div
               key={title}
-              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 text-left"
+              className="bg-white p-5 md:p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 text-left"
             >
-              <Icon className="w-12 h-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">{title}</h3>
-              <p className="text-gray-600">{text}</p>
+              <Icon className="w-10 h-10 md:w-12 md:h-12 text-primary mb-3 md:mb-4" />
+              <h3 className="text-lg md:text-xl font-semibold mb-1.5 md:mb-2">{title}</h3>
+              <p className="text-gray-600 text-sm md:text-base">{text}</p>
             </div>
           ))}
         </div>

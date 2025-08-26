@@ -166,3 +166,16 @@ button:focus, a:focus, input:focus, textarea:focus { @apply outline-primary outl
 .credit-brand, .credit-brand * {
   transition: transform .35s ease, opacity .35s ease, filter .35s ease;
 }
+
+/* ===== Compactação automática para notebooks (≤1366px) ===== */
+@media (max-width: 1366px) {
+  /* diminui 1rem de 16px -> 15px, encolhendo espaçamentos/typo do Tailwind */
+  html { font-size: 15px; }
+
+  /* containers um pouco mais estreitos para evitar “estouro visual” */
+  .container-tight { max-width: 72rem; } /* ~1152px */
+
+  /* cards ficam um pouco mais “enxutos” */
+  .card-compact { padding: 0.875rem; }
+  .gap-compact { gap: 1.25rem; } /* ~gap-5 */
+}

@@ -75,17 +75,18 @@ export default function ClienteCadastro() {
 
       {/* SEÇÃO COM MASCOTE FIXO */}
       <section className="relative bg-gray-100">
-        {/* Mascote próprio da página (o global fica oculto em /cliente/*) */}
+        {/* Mascote menor SÓ nesta página */}
         <div className="hidden md:block fixed left-0 bottom-0 z-10 pointer-events-none">
           <img
             src={withBase('assets/cezar2.png')}
             alt="Mascote CB"
-            className="h-[75vh] max-h-[680px] w-auto object-contain drop-shadow-2xl"
+            className="w-[clamp(140px,18vw,320px)] h-auto object-contain drop-shadow-2xl"
+            draggable={false}
           />
         </div>
 
         {/* Conteúdo com espaço reservado ao mascote no desktop */}
-        <div className="min-h-screen max-w-6xl mx-auto py-12 px-4 md:pl-[320px]">
+        <div className="min-h-screen max-w-6xl mx-auto py-12 px-4 md:pl-[240px] lg:pl-[280px] xl:pl-[320px]">
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
             {/* Cabeçalho */}
             <div className="mb-8">
@@ -154,7 +155,7 @@ export default function ClienteCadastro() {
                 <input name="addressCep" className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none" inputMode="numeric" pattern="[0-9]*" placeholder="Apenas números" required />
               </div>
 
-              {/* Telefone (DDD + número) */}
+              {/* Telefone */}
               <div>
                 <label className="font-medium text-gray-700">Telefone</label>
                 <div className="flex gap-2">

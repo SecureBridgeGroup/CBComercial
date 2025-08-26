@@ -1,140 +1,127 @@
-import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Send, MessageCircle } from 'lucide-react';
+// src/components/Contact.tsx
+import { Mail, Phone, MapPin, Send } from 'lucide-react';
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: ''
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert('Mensagem enviada com sucesso!');
-    setFormData({ name: '', email: '', phone: '', message: '' });
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const contactInfo = [
-    {
-      icon: <MapPin className="w-6 h-6 text-primary" />,
-      title: 'Endereço',
-      text: <>Rua Ricardo Ramos, nº 9 - Planalto<br />CEP 69.044-770 - Manaus, AM</>
-    },
-    {
-      icon: <Phone className="w-6 h-6 text-primary" />,
-      title: 'Telefones',
-      text: <>+55 92 3016-7065<br />+55 92 99981-5891</>
-    },
-    {
-      icon: <Mail className="w-6 h-6 text-primary" />,
-      title: 'E-mail',
-      text: <>cb@cbcomercial.com.br<br />fiscal@cbcomercial.com.br</>
-    },
-    {
-      icon: <MessageCircle className="w-6 h-6 text-primary" />,
-      title: 'WhatsApp',
-      text: (
-        <>
-          Atendimento rápido e direto<br />
-          <a
-            href="https://wa.me/5592999815891"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mt-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
-            aria-label="Falar no WhatsApp"
-          >
-            Chamar no WhatsApp
-          </a>
-        </>
-      )
-    }
-  ];
-
   return (
-    <section
-      id="contato"
-      className="py-24 relative bg-gradient-to-br from-[#f2f6fc] via-[#e7f0ff] to-white overflow-hidden scroll-mt-16"
-    >
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[url('/pattern-light.svg')] bg-cover opacity-10 z-0" />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">
+    <section id="contato" className="py-20 md:py-24 bg-gradient-to-b from-blue-50/50 to-white scroll-mt-16">
+      <div className="max-w-7xl container-tight mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Cabeçalho */}
+        <div className="text-center mb-10 md:mb-14">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 md:mb-4">
             Fale <span className="text-primary">Conosco</span>
           </h2>
-          <div className="w-24 h-1 bg-primary mx-auto mb-8" />
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Entre em contato conosco e descubra como podemos atender às necessidades do seu negócio.
+          <div className="w-20 md:w-24 h-1 bg-primary mx-auto mb-4" />
+          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
+            Tire dúvidas, faça orçamentos e fale com nosso time comercial.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          {/* Contact Info Blocks */}
-          <div className="space-y-8">
-            <h3 className="text-2xl font-bold text-gray-800 mb-8">Informações de Contato</h3>
-
-            {contactInfo.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-start space-x-4 p-6 bg-white shadow-md rounded-lg hover:shadow-lg transition-all duration-300"
-              >
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  {item.icon}
-                </div>
+        {/* Grid principal */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-8 gap-compact">
+          {/* Coluna: informações */}
+          <div className="space-y-5 md:space-y-6">
+            <div className="bg-white rounded-2xl shadow-md p-4 md:p-6 card-compact">
+              <div className="flex items-start gap-3 md:gap-4">
+                <span className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 text-primary">
+                  <MapPin className="w-5 h-5 md:w-6 md:h-6" />
+                </span>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-1">{item.title}</h4>
-                  <p className="text-gray-600">{item.text}</p>
+                  <h3 className="text-lg md:text-xl font-semibold text-gray-900">Endereço</h3>
+                  <p className="text-sm md:text-base text-gray-600 mt-1">
+                    Rua Ricardo Ramos, nº 9 - Planalto<br />
+                    CEP 69.044-770 - Manaus, AM
+                  </p>
                 </div>
               </div>
-            ))}
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-md p-4 md:p-6 card-compact">
+              <div className="flex items-start gap-3 md:gap-4">
+                <span className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 text-primary">
+                  <Phone className="w-5 h-5 md:w-6 md:h-6" />
+                </span>
+                <div>
+                  <h3 className="text-lg md:text-xl font-semibold text-gray-900">Telefones</h3>
+                  <p className="text-sm md:text-base text-gray-600 mt-1">
+                    +55 92 3016-7065<br />
+                    +55 92 99981-5891
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-md p-4 md:p-6 card-compact">
+              <div className="flex items-start gap-3 md:gap-4">
+                <span className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 text-primary">
+                  <Mail className="w-5 h-5 md:w-6 md:h-6" />
+                </span>
+                <div>
+                  <h3 className="text-lg md:text-xl font-semibold text-gray-900">E-mails</h3>
+                  <p className="text-sm md:text-base text-gray-600 mt-1">
+                    cb@cbcomercial.com.br<br />
+                    fiscal@cbcomercial.com.br
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Contact Form */}
-          <div className="bg-white shadow-lg rounded-lg p-8">
-            <h3 className="text-2xl font-bold text-gray-800 mb-8">Envie sua Mensagem</h3>
+          {/* Coluna: formulário */}
+          <div className="bg-white rounded-2xl shadow-md p-4 md:p-6 lg:p-8 card-compact">
+            <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 md:mb-6">
+              Envie sua Mensagem
+            </h3>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {['name', 'email', 'phone'].map((field) => (
+            <form
+              className="space-y-4 md:space-y-5"
+              onSubmit={(e) => {
+                e.preventDefault();
+                alert('Mensagem enviada! Em breve entraremos em contato.');
+              }}
+            >
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Seu Nome</label>
                 <input
-                  key={field}
-                  type={field === 'email' ? 'email' : 'text'}
-                  name={field}
-                  value={formData[field as keyof typeof formData]}
-                  onChange={handleInputChange}
-                  placeholder={
-                    field === 'name' ? 'Seu Nome' : field === 'phone' ? 'Telefone' : 'Seu E-mail'
-                  }
+                  type="text"
+                  className="w-full h-11 md:h-12 px-3.5 md:px-4 text-sm md:text-base rounded-lg border border-gray-300 focus:border-primary focus:ring-0"
+                  placeholder="Digite seu nome"
                   required
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
                 />
-              ))}
+              </div>
 
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleInputChange}
-                placeholder="Sua Mensagem"
-                rows={6}
-                required
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all duration-300"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Seu E-mail</label>
+                <input
+                  type="email"
+                  className="w-full h-11 md:h-12 px-3.5 md:px-4 text-sm md:text-base rounded-lg border border-gray-300 focus:border-primary focus:ring-0"
+                  placeholder="voce@empresa.com"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                <input
+                  type="tel"
+                  className="w-full h-11 md:h-12 px-3.5 md:px-4 text-sm md:text-base rounded-lg border border-gray-300 focus:border-primary focus:ring-0"
+                  placeholder="(92) 99999-9999"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Sua Mensagem</label>
+                <textarea
+                  className="w-full min-h-[9rem] md:min-h-[10rem] px-3.5 md:px-4 py-2.5 md:py-3 text-sm md:text-base rounded-lg border border-gray-300 focus:border-primary focus:ring-0 resize-y"
+                  placeholder="Como podemos ajudar?"
+                />
+              </div>
 
               <button
                 type="submit"
-                className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-800 transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
+                className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-blue-800 text-white rounded-lg px-4 md:px-6 h-11 md:h-12 text-sm md:text-base font-semibold transition-colors"
               >
-                <Send className="w-5 h-5" />
-                <span>Enviar Mensagem</span>
+                <Send className="w-4 h-4 md:w-5 md:h-5" />
+                Enviar Mensagem
               </button>
             </form>
           </div>

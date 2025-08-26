@@ -1,5 +1,6 @@
 // src/pages/ClienteLayout.tsx
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { LogOut, UserCircle2 } from 'lucide-react';
 import { clearToken } from '../utils/api';
 import { basePath } from '../utils/basePath';
@@ -17,8 +18,20 @@ const tabs = [
   { to: 'senha',     label: 'Alterar senha' },
 ];
 
+// largura do mascote (e do spacer) — ajuste à vontade
+const MASC_W = 'clamp(220px,24vw,360px)';
+
 export default function ClienteLayout() {
   const navigate = useNavigate();
+
+  // Esconde o mascote GLOBAL enquanto a área do cliente estiver montada
+  useEffect(() => {
+    const nodes = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-global-mascot], img[alt="Mascote CB Comercial"]')
+    );
+    nodes.forEach(n => (n.style.display = 'none'));
+    return () => { nodes.forEach(n => (n.style.display = '')); };
+  }, []);
 
   const logout = () => {
     clearToken();
@@ -26,67 +39,77 @@ export default function ClienteLayout() {
   };
 
   return (
-    <section className="relative min-h-screen bg-gray-100 py-10 px-6 md:pl-[280px]">
-      {/* Mascote fixo à esquerda */}
-      <div className="hidden md:block fixed left-0 bottom-0 z-10 pointer-events-none">
+    <section className="relative min-h-screen bg-gray-100 py-10 px-6 overflow-x-clip">
+      {/* Mascote FIXO à esquerda (LOCAL desta página) */}
+      <div
+        className="hidden md:block fixed left-0 bottom-0 z-10 pointer-events-none select-none"
+        aria-hidden="true"
+        style={{ width: MASC_W }}
+      >
         <img
           src={withBase('assets/cezar2.png')}
           alt="Mascote CB"
-          className="w-[260px] lg:w-[300px] xl:w-[340px] h-auto object-contain drop-shadow-2xl"
+          className="w-full h-auto object-contain drop-shadow-2xl"
         />
       </div>
 
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-          <div className="flex items-start md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-blue-50 text-primary flex items-center justify-center">
-                <UserCircle2 className="w-7 h-7" />
+        {/* Linha com spacer + conteúdo */}
+        <div className="md:flex md:gap-8 items-stretch">
+          {/* Spacer invisível com a MESMA largura do mascote */}
+          <div className="hidden md:block shrink-0" style={{ width: MASC_W }} />
+
+          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 w-full">
+            <div className="flex items-start md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-blue-50 text-primary flex items-center justify-center">
+                  <UserCircle2 className="w-7 h-7" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-semibold text-gray-900">Área do Cliente</h1>
+                  <p className="text-gray-600 text-sm">Gerencie seus dados, pedidos e suporte.</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-semibold text-gray-900">Área do Cliente</h1>
-                <p className="text-gray-600 text-sm">Gerencie seus dados, pedidos e suporte.</p>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => navigate('/cliente/area/dados')}
+                  className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-sm font-medium"
+                >
+                  Atualizar cadastro
+                </button>
+                <button
+                  onClick={logout}
+                  className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium"
+                  title="Sair"
+                >
+                  <LogOut className="w-4 h-4" /> Sair
+                </button>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => navigate('/cliente/area/dados')}
-                className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-sm font-medium"
-              >
-                Atualizar cadastro
-              </button>
-              <button
-                onClick={logout}
-                className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium"
-                title="Sair"
-              >
-                <LogOut className="w-4 h-4" /> Sair
-              </button>
+            {/* Abas */}
+            <div className="mt-4 flex flex-wrap gap-3">
+              {tabs.map((t) => (
+                <NavLink
+                  key={t.to}
+                  to={t.to}
+                  end
+                  className={({ isActive }) =>
+                    `px-4 py-2 rounded-xl text-sm font-medium ${
+                      isActive ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`
+                  }
+                >
+                  {t.label}
+                </NavLink>
+              ))}
             </div>
-          </div>
 
-          {/* Abas */}
-          <div className="mt-4 flex flex-wrap gap-3">
-            {tabs.map((t) => (
-              <NavLink
-                key={t.to}
-                to={t.to}
-                end
-                className={({ isActive }) =>
-                  `px-4 py-2 rounded-xl text-sm font-medium ${
-                    isActive ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`
-                }
-              >
-                {t.label}
-              </NavLink>
-            ))}
-          </div>
-
-          {/* Conteúdo da aba */}
-          <div className="mt-6">
-            <Outlet />
+            {/* Conteúdo da aba */}
+            <div className="mt-6">
+              <Outlet />
+            </div>
           </div>
         </div>
       </div>
